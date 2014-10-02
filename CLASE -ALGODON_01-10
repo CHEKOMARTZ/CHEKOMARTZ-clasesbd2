@@ -1,0 +1,84 @@
+CREATE TABLE ALGODON(ID_ALGO INTEGER, NOMBRE VARCHAR2(120), EDAD INTEGER,
+                      CONSTRAINT PK_ID_ALGO PRIMARY KEY (ID_ALGO) );   
+
+CREATE SEQUENCE SECUENCIA_ALGODON
+START WITH 1
+INCREMENT BY 1
+NOMAXVALUE;
+
+CREATE OR REPLACE PROCEDURE GUARDAR_ALGODON(MY_ID_ALGODON OUT INTEGER, MY_NOMBRE IN VARCHAR2, MY_EDAD IN INTEGER)
+AS
+BEGIN
+SELECT SECUENCIA_ALGODON.NEXTVAL INTO MY_ID_ALGODON FROM DUAL;
+INSERT INTO ALGODON VALUES(MY_ID_ALGODON, MY_NOMBRE, MY_EDAD);
+END
+/
+
+
+
+
+
+DECLARE
+VALOR INTEGER;
+BEGIN
+GUARDAR_ALGODON(VALOR,'SERGIO',21);
+DBMS_OUTPUT.PUT_LINE('REGISTRO GUARDADO CON ID: '||VALOR);
+END;
+/
+
+SELECT * FROM ALGODON;
+
+
+NETBEANS
+
+ CONEXION.JAVA
+
+package com.jc.model;
+
+/**
+ *
+ * @author campitos
+ */
+
+import java.sql.*;
+public class Conexion {
+    
+    public static Connection conectarse()throws Exception{
+        String url="jdbc:oracle:thin:@localhost:1521:XE";
+       Class.forName("oracle.jdbc.OracleDriver");
+       Connection con=DriverManager.getConnection(url,"system","system");
+       return con;
+    }
+    
+}
+
+
+
+
+
+TESTPROCEDIMIENTO.JAVA
+
+package com.jc.model;
+
+import java.sql.CallableStatement;
+import java.sql.Connection;
+
+/**
+ *
+ * @author campitos
+ */
+public class TestProcedimiento {
+    public static void main(String args[])throws Exception{
+        Conexion c=new Conexion();
+        Connection con=c.conectarse();
+     CallableStatement callate=con.prepareCall("{call guardar_algodon(?,?,?)}");
+        callate.registerOutParameter(1,java.sql.Types.INTEGER);
+        callate.setString(2,"juan");
+        callate.setInt(3,21);
+      
+        callate.execute();
+        int pk=callate.getInt(1);
+        System.out.println("El id ingresado es:"+pk);
+    }
+    
+}
