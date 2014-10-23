@@ -1,0 +1,23 @@
+
+Del proyecto anterior vas a implementar un procedimiento que se llame eficiencia_developer, que reciba como argumento de entrada el id del desarrollador y que contenga como argumento de salida el id de las tareas no completadas. Deberá regresar algo asi como "El siguiente desarrollador tiene por completar las tareas cuyos id's son: 1,6, y 7". 
+
+•
+Implementar otro procedimiento almacenado cuyo nombre sea analziar_tarea_incompleta; cuyos argumentos de entrada sean el id del desarrollador y un id de alguna tarea incompleta( que se puede obtener previamente del procedimiento anterior). El procedimiento debe tener un tipo de salida que indique el porcentaje y la fecha última de actualizacion de dicha tarea.
+
+•
+Implementar un procedimiento almacenado que se llame eficiencia_empresa, que solo contenga un tipó de salida como argumento, el cual debe indicar: El procentaje de tareas no completadas de todos los desarrolladores. Sacar el procentaje con base al numero de tareas totales por todos los desarrolladores. NOTA: Es importante usar un cursor para este procedimiento.
+
+
+
+
+
+CREATE OR REPLACE PROCEDURE EFICIENCIA_DEVELOPER(MY_ID_TAREA OUT INTEGER, MY_ID_DEVELOPER IN INTEGER,MY_DESCRIPCION IN VARCHAR2, 
+MY_COMPLETADA IN CHAR, MY_PORCIENTO_COMPLETADA INTEGER, MY_FECHA DATE)
+AS 
+BEGIN
+SELECT SECUENCIA_TAREA.NEXTVAL INTO MY_ID_TAREA FROM DUAL;  
+INSERT INTO TAREA VALUES (MY_ID_TAREA, MY_ID_DEVELOPER, MY_DESCRIPCION, MY_COMPLETADA, MY_PORCIENTO_COMPLETADA, MY_FECHA);  
+END;   
+ 
+ 
+SELECT DEVELOPER.ID_DEVELOPER,TAREA.ID_TAREA FROM DEVELOPER; 
