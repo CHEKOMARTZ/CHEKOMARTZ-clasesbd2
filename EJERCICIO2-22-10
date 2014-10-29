@@ -1,23 +1,75 @@
 
-Del proyecto anterior vas a implementar un procedimiento que se llame eficiencia_developer, que reciba como argumento de entrada el id del desarrollador y que contenga como argumento de salida el id de las tareas no completadas. Deberá regresar algo asi como "El siguiente desarrollador tiene por completar las tareas cuyos id's son: 1,6, y 7". 
+•Del proyecto anterior vas a implementar un procedimiento que se llame eficiencia_developer, 
+que reciba como argumento de entrada el id del desarrollador y que contenga como argumento de 
+salida el id de las tareas no completadas. Deberá regresar algo asi como "El siguiente desarrollador tiene 
+por completar las tareas cuyos id's son: 1,6, y 7". 
 
-•
-Implementar otro procedimiento almacenado cuyo nombre sea analziar_tarea_incompleta; cuyos argumentos de entrada sean el id del desarrollador y un id de alguna tarea incompleta( que se puede obtener previamente del procedimiento anterior). El procedimiento debe tener un tipo de salida que indique el porcentaje y la fecha última de actualizacion de dicha tarea.
+•Implementar otro procedimiento almacenado cuyo nombre sea analziar_tarea_incompleta; cuyos argumentos de entrada
+sean el id del desarrollador y un id de alguna tarea incompleta( que se puede obtener previamente del procedimiento anterior).
+El procedimiento debe tener un tipo de salida que indique el porcentaje y la fecha última de actualizacion de dicha tarea.
 
-•
-Implementar un procedimiento almacenado que se llame eficiencia_empresa, que solo contenga un tipó de salida como argumento, el cual debe indicar: El procentaje de tareas no completadas de todos los desarrolladores. Sacar el procentaje con base al numero de tareas totales por todos los desarrolladores. NOTA: Es importante usar un cursor para este procedimiento.
+•Implementar un procedimiento almacenado que se llame eficiencia_empresa, que solo contenga un tipó de salida como argumento,
+el cual debe indicar: El procentaje de tareas no completadas de todos los desarrolladores. Sacar el procentaje 
+con base al numero de tareas totales por todos los desarrolladores.
+NOTA: Es importante usar un cursor para este procedimiento.
 
 
 
 
 
-CREATE OR REPLACE PROCEDURE EFICIENCIA_DEVELOPER(MY_ID_TAREA OUT INTEGER, MY_ID_DEVELOPER IN INTEGER,MY_DESCRIPCION IN VARCHAR2, 
-MY_COMPLETADA IN CHAR, MY_PORCIENTO_COMPLETADA INTEGER, MY_FECHA DATE)
+SET SERVEROUTPUT ON; 
+ 
+CREATE OR REPLACE PROCEDURE EFICIENCIA_DEVELOPER (MY_ID_DEVELOPER IN INTEGER, TAREAS OUT VARCHAR2) 
 AS 
-BEGIN
-SELECT SECUENCIA_TAREA.NEXTVAL INTO MY_ID_TAREA FROM DUAL;  
-INSERT INTO TAREA VALUES (MY_ID_TAREA, MY_ID_DEVELOPER, MY_DESCRIPCION, MY_COMPLETADA, MY_PORCIENTO_COMPLETADA, MY_FECHA);  
-END;   
+CURSOR CURSOR_TAREAS IS SELECT ID_TAREA FROM TAREA WHERE ID_DEVELOPER=MY_ID_DEVELOPER AND COMPLETADA='N'; 
+BEGIN 
+TAREAS := 'El siguiente desarrollador tiene por completar las tareas cuyos ids son: '; 
+FOR TAREA IN CURSOR_TAREAS LOOP 
+TAREAS := TAREAS || TAREA.ID_TAREA || ', '; 
+END LOOP; 
+END; 
  
+DECLARE 
+TEXTO VARCHAR2(255); 
+BEGIN 
+EFICIENCIA_DEVELOPER(1, TEXTO); 
+DBMS_OUTPUT.PUT_LINE(TEXTO); 
+END; 
  
-SELECT DEVELOPER.ID_DEVELOPER,TAREA.ID_TAREA FROM DEVELOPER; 
+CREATE OR REPLACE PROCEDURE ANALZIAR_TAREA_INCOMPLETA (MY_ID_DEVELOPER IN INTEGER, MY_ID_TAREA IN INTEGER, MY_PORCENTAGE OUT INTEGER, MY_FECHA OUT DATE) 
+AS 
+BEGIN 
+SELECT PORCIENTO_COMPLETADA INTO MY_PORCENTAGE FROM TAREA WHERE ID_TAREA=MY_ID_TAREA AND ID_DEVELOPER=MY_ID_DEVELOPER; 
+SELECT FECHA INTO MY_FECHA FROM TAREA WHERE ID_TAREA=MY_ID_TAREA AND ID_DEVELOPER=MY_ID_DEVELOPER; 
+END; 
+ 
+DECLARE 
+PORCENTAGE INTEGER; 
+FECHA DATE; 
+BEGIN 
+ANALZIAR_TAREA_INCOMPLETA(1, 1, PORCENTAGE, FECHA); 
+DBMS_OUTPUT.PUT_LINE('PORCENTAGE: ' || PORCENTAGE || ' FECHA: ' || FECHA); 
+END; 
+ 
+CREATE OR REPLACE PROCEDURE EFICIENCIA_EMPRESA(PORCENTAGE OUT FLOAT) 
+AS 
+TOTAL_TAREAS INTEGER; 
+TOTAL_PORCIENTO INTEGER; 
+CURSOR CURSOR_TAREAS IS SELECT * FROM TAREA; 
+BEGIN 
+TOTAL_PORCIENTO := 0; 
+TOTAL_TAREAS := 0; 
+FOR TAREA IN CURSOR_TAREAS LOOP 
+TOTAL_PORCIENTO := TOTAL_PORCIENTO + TAREA.PORCIENTO_COMPLETADA; 
+TOTAL_TAREAS := TOTAL_TAREAS + 1; 
+END LOOP; 
+PORCENTAGE := TOTAL_PORCIENTO/TOTAL_TAREAS; 
+END; 
+
+ 
+DECLARE 
+VALOR FLOAT; 
+BEGIN 
+EFICIENCIA_EMPRESA(VALOR); 
+DBMS_OUTPUT.PUT_LINE(VALOR); 
+END; 
